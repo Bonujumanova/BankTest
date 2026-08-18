@@ -1,7 +1,10 @@
 from src.main.api.models.base_model import BaseModel
 
-class LoginUserResponse:
-    id: int
+class User(BaseModel):
     username: str
-    password: str
     role: str
+
+
+class LoginUserResponse(BaseModel):
+    token: str
+    user: User

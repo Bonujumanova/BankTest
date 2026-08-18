@@ -1,74 +1,69 @@
 import requests
 import pytest
 
-@pytest.mark.api
+from src.main.api.models.create_user_request import CreateUserRequest
+from src.main.api.models.login_user_request import LoginUserRequest
+from src.main.api.models.login_user_response import LoginUserResponse
 
+
+@pytest.mark.api
 class TestUserLogin:
 
     def test_login_admin(self):
+        login_user_request = LoginUserRequest(username="admin", password="123456")
         # Авторизация администратора
-        login_admin_response = requests.post(url="http://localhost:4111/api/auth/token/login",
-                                             json={"username": "admin",
-                                                   "password": "123456"
-                                                   },
+        response = requests.post(url="http://localhost:4111/api/auth/token/login",
+                                             json=login_user_request.model_dump(),
                                              headers={"accept": "application/json",
                                                       "Content-Type": "application/json"}
                                              )
 
-        assert login_admin_response.status_code == 200
+        assert response.status_code == 200
+        login_user_response = LoginUserResponse(**response.json())
         # Работа с вложенным словарем
-        assert login_admin_response.json().get("user").get("username") == "admin"
-        assert login_admin_response.json().get("user").get("role") == "ROLE_ADMIN"
-        print(f"ПЕЧАТАЮ ИМЯ АДМИНА: {login_admin_response.json().get("user").get("username")}")
+        assert login_user_request.username == login_user_response.user.username
+        assert login_user_response.user.role == "ROLE_ADMIN"
+        print(f"ПЕЧАТАЮ ИМЯ АДМИНА: {response.json().get("user").get("username")}")
 
 
     def test_login_user(self):
+        login_admin_request = LoginUserRequest(username="admin", password="123456")
         # Авторизация админа
-        login_admin_response = requests.post(url="http://localhost:4111/api/auth/token/login",
-                                             json={"username": "admin",
-                                                   "password": "123456"
-                                                   },
+        response = requests.post(url="http://localhost:4111/api/auth/token/login",
+                                             json=login_admin_request.model_dump(),
                                              headers={"accept": "application/json",
                                                       "Content-Type": "application/json"}
                                              )
-        assert login_admin_response.status_code == 200
+        assert response.status_code == 200
 
         # Получение токена
-        token = login_admin_response.json().get("token")
+        token = response.json().get("token")
 
+
+        create_user_request = CreateUserRequest(username="Max23", password="Pas!sw0rd", role="ROLE_USER")
         # Админ создает пользователя
-        create_user_response = requests.post(
+        response = requests.post(
             url="http://localhost:4111/api/admin/create",
-            json={
-                "username": "Max66",
-                "password": "Pas!sw0rd",
-                "role": "ROLE_USER"
-            },
+            json=create_user_request.model_dump(),
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}"
             }
         )
 
-        assert create_user_response.status_code == 200
+        assert response.status_code == 200
 
-        login_user_response = requests.post(
+        login_user_request = LoginUserRequest(username="Max23", password="Pas!sw0rd")
+        response = requests.post(
             url="http://localhost:4111/api/auth/token/login",
-            json={
-                "username": "Max66",
-                "password": "Pas!sw0rd"
-            },
+            json=login_user_request.model_dump(),
             headers={
                 "accept": "application/json",
                 "Content-Type": "application/json"
             }
         )
 
-        assert login_user_response.status_code == 200
-        assert login_user_response.json().get("user").get("username") == "Max66"
-        assert login_user_response.json().get("user").get("role") == "ROLE_USER"
-
-
-
-
-
+        assert response.status_code == 200
+        login_user_response = LoginUserResponse(**response.json())
+        assert login_user_request.username == login_user_response.user.username
+        assert login_user_response.user.role == "ROLE_USER"
