@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Callable
 
+from requests import Response
+
 from src.main.api.models.base_model import BaseModel
 
 
@@ -11,5 +13,5 @@ class Requester(ABC):
         self.response_spec = response_spec
 
     @abstractmethod
-    def post(self, model: BaseModel):...
+    def post(self, model: BaseModel) -> BaseModel | Response:...
 
