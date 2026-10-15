@@ -1,5 +1,11 @@
 from src.main.api.models.base_model import BaseModel
 
+class Transactions(BaseModel):
+    transactionId: int
+    type: str
+    amount: int
+    fromAccountId: int
+    createdAt: str
 
 class TransactionsHistoryResponse(BaseModel):
     id: int
@@ -7,9 +13,4 @@ class TransactionsHistoryResponse(BaseModel):
     balance: float
     transactions: list[Transactions]
 
-class Transactions(BaseModel):
-    transactionId: int
-    type: str
-    amount: int
-    fromAccountId: int
-    createdAt: str
+

@@ -1,10 +1,6 @@
 from src.main.api.models.base_model import BaseModel
 
 
-class CreditHistoryResponse(BaseModel):
-    userId: int
-    credits: list[CreditInfo]
-
 class CreditInfo(BaseModel):
     creditId: int
     accountId: int
@@ -12,3 +8,8 @@ class CreditInfo(BaseModel):
     termMonths: int
     balance: int
     createdAt: str
+
+
+class CreditHistoryResponse(BaseModel):
+    userId: int
+    credits: list[CreditInfo]
