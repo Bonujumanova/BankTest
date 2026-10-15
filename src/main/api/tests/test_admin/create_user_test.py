@@ -9,6 +9,7 @@ from src.main.api.specs.request_specs import RequestSpecs
 from src.main.api.specs.response_specs import ResponseSpecs
 import pytest
 
+
 class TestCreateUser:
 
     # Интегрирование allure в тест (Посмотреть отчет: allure serve allure-results)
@@ -18,7 +19,6 @@ class TestCreateUser:
     def test_create_user(self):
         # Авторизация администратора
         # Отправка Post-запроса для авторизации
-
         username = f"Grinch{uuid.uuid4().hex[:3]}"
         print(f"URL: {Config.fetch('backendUrl')}")
         create_user_request = CreateUserRequest(username=username, password="Pas!sw0rd", role="ROLE_USER")
@@ -42,13 +42,8 @@ class TestCreateUser:
                 allure.attachment_type.JSON
             )
 
-
             assert create_user_request.username == response.username
-
             assert create_user_request.role == response.role
-
-
-
 
 
     @pytest.mark.parametrize(
